@@ -34,13 +34,13 @@ def add_db(movie_info):
             );
         ''')
 
-        start = len(cursor.execute('SELECT * FROM imdb').fetchall())
+        start = len(cursor.execute('SELECT * FROM budget').fetchall())
         end = start + 25
         for i in range(start, end):
             if i >= len(movie_info):
                 break
             row = movie_info[i]
-            cursor.execute('INSERT INTO imdb (title, budget) VALUES (?, ?)',
+            cursor.execute('INSERT INTO budget (title, budget) VALUES (?, ?)',
                         (row['title'], row['budget']))
         conn.commit()
     conn.close()
