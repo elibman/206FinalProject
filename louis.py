@@ -26,11 +26,13 @@ def Getratingfromimdb():
    d = json.loads(data)
 
 
-   info = {}
+   titles = []
+   ratings = []
    ids = []
    for x in d:
        ids.append(x["imdbid"])
-       info[x["title"]] = x["rating"]
+       titles.append(x["title"])
+       ratings.append(x["rating"])
   
    with sqlite3.connect('imdb.db') as conn:
        cur = conn.cursor()
@@ -42,15 +44,18 @@ def Getratingfromimdb():
            );
        ''')
        conn.commit()
-
-
-       start = len(cur.execute("select * from imdb"))
+           
+       start = len(cur.execute("select * from imdb").fetchall())
+       
        end = start + 25
        while start < end:
-           row = info.items()
-           cur.execute('INSERT INTO imdb (title, rating) VALUES (?, ?)',
-               (row[start[0]], row[start[1]]))
-           start += 1
+            try:
+                cur.execute('INSERT INTO imdb (title, rating) VALUES (?, ?)',
+                    (titles[start], ratings[start]))
+                conn.commit()
+                start += 1
+            except:
+                return None
 
 
        cur.close()
