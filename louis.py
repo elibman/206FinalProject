@@ -20,7 +20,9 @@ def Getratingfromimdb():
     d = json.loads(data)
 
     info = {}
+    ids = []
     for x in d:
+        ids.append(x["imdbid"])
         info[x["title"]] = x["rating"]
     
     with sqlite3.connect('imdb.db') as conn:
@@ -34,10 +36,40 @@ def Getratingfromimdb():
         ''')
         conn.commit()
 
-        for title, rating in info.items():
+        start = len(cur.execute("select * from imdb"))
+        end = start + 25
+        while start < end:
+            row = info.items()
             cur.execute('INSERT INTO imdb (title, rating) VALUES (?, ?)',
-            (title, rating))
+        		(row[start[0]], row[start[1]]))
             conn.commit()
+            start += 1
         cur.close()
 
 Getratingfromimdb()
+
+
+
+
+'''        
+make to 25 each
+
+use length of data base as index 
+
+ask how to do 25 
+how to clarify that we are all adding to the same data base so it is all one and how multiple people see it 
+
+establish where you need to start counting
+
+use count function
+'''
+"""
+start = len(cur.execute("select * from imdb"))
+end = start + 25
+while start < end:
+    row = info.items()
+    cur.execute('INSERT INTO imdb (title, rating) VALUES (?, ?)',
+        (row[start[0]], row[start[1]]))
+    start += 1
+    
+"""
