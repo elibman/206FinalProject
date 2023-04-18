@@ -1,10 +1,28 @@
 import sqlite3
 import requests
+import json
 
 
-id_lst = ['tt0068646', 'tt0468569', 'tt0071562', 'tt0050083', 'tt0108052', 'tt0167260', 'tt0110912', 'tt0120737', 
-       'tt0060196', 'tt0109830', 'tt0137523', 'tt0167261', 'tt1375666', 'tt0080684', 'tt0133093',
-       'tt0073486', 'tt0114369', 'tt0038650', 'tt0047478', 'tt0102926', 'tt0120815', 'tt0317248', 'tt0816692']
+def getmovieid():
+   url = "https://imdb-top-100-movies.p.rapidapi.com/"
+
+
+   headers = {
+   "X-RapidAPI-Key": "d53ac055e7mshea37be8e69920fap17a024jsnc6076add2e01",
+   "X-RapidAPI-Host": "imdb-top-100-movies.p.rapidapi.com"
+   }
+  
+   response = requests.request("GET", url, headers=headers)
+   data = response.text
+   d = json.loads(data)
+
+
+   ids = []
+   for x in d:
+       ids.append(x["imdbid"])
+   return ids
+
+
 
 def get_budget(id_lst):
     budget_list = []
@@ -33,6 +51,8 @@ def add_db(movie_info):
                 budget INTEGER NOT NULL
             );
         ''')
+        
+
 
         start = len(cursor.execute('SELECT * FROM budget').fetchall())
         end = start + 25
@@ -47,5 +67,5 @@ def add_db(movie_info):
 
 
 
-get_budget(id_lst)
-add_db(get_budget(id_lst))
+get_budget(getmovieid())
+add_db(get_budget(getmovieid()))
