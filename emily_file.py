@@ -25,63 +25,41 @@ def GetGenre():
     movies = info.keys()
     #print(movies)
 
-    dct = {}
+    genres_dct = {}
+    genres_lst = []
     for movie_title in movies:
         #print(movie_title)
         url = f"https://itunes.apple.com/search?term={movie_title}&entity=movie"
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json() # parse JSON data
+            for entry in data['results']:
+                genres_lst.append(entry['primaryGenreName'])
         else:
             print(f"Error: {response.status_code}")
+    unique_genres = list(set(genres_lst))
+    #print(unique_genres)
+        
+    id = 0
+    for genre in unique_genres:
+        genres_dct[id] = genre
+        id += 1
+    #print(genres_dct)
+    
+    with sqlite3.connect('itunes.db') as conn:
+        cur = conn.cursor()
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS itunes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                genre STRING
+            );
+        ''')
+        conn.commit()
 
-        #print(data)
-        #iterate over the movie entries in the response and print the title and rating
-        for entry in data['results']:
-            #print(entry)
-            genres = entry['primaryGenreName']
-            print(genres)
+        for id, genre in genres_dct.items():
+            cur.execute('INSERT INTO itunes (id, genre) VALUES (?, ?)',
+            (id, genre))
+            conn.commit()
+        cur.close()
 
 GetGenre()
-# url = 'https://itunes.apple.com/us/rss/topmovies/limit=100/json' # iTunes API URL to fetch top 100 movies
-
-#  # send GET request to fetch data       
-
-# data = response.json() # parse JSON data
-# print(data)
-
-# #print(data)
-# #iterate over the movie entries in the response and print the title and rating
-# for entry in data['feed']['entry']:
-#     title = entry['title']['label']
-#     genres = entry['category']['attributes']['term']
-#     print(genres)
-#     #print(title)
-
-#import requests
-
-# url = "https://mdblist.p.rapidapi.com/"
-
-# headers = {
-# 	"X-RapidAPI-Key": "536c152bbemshbc7cbb92a43fe41p1ff4fbjsnba9018e95bd7",
-# 	"X-RapidAPI-Host": "mdblist.p.rapidapi.com"
-# }
-
-# response = requests.request("GET", url, headers=headers)
-
-# print(response.text)
-
-# import requests
-
-# url = "https://ott-details.p.rapidapi.com/advancedsearch"
-
-# querystring = {"max_imdb":"100","language":"english","type":"movie","sort":"highestrated","page":"1"}
-
-# headers = {
-# 	"X-RapidAPI-Key": "536c152bbemshbc7cbb92a43fe41p1ff4fbjsnba9018e95bd7",
-# 	"X-RapidAPI-Host": "ott-details.p.rapidapi.com"
-# }
-
-# response = requests.request("GET", url, headers=headers, params=querystring)
-
-# print(response.text)
