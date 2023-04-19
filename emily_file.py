@@ -20,6 +20,8 @@ def GetGenre():
 
     info = {}
     for x in d:
+        title = x['title']
+        rating = x['rating']
         info[x["title"]] = x["rating"]
 
     movies = info.keys()
@@ -27,6 +29,8 @@ def GetGenre():
 
     genres_dct = {}
     genres_lst = []
+    newdct = {}
+    newlst = []
     for movie_title in movies:
         #print(movie_title)
         url = f"https://itunes.apple.com/search?term={movie_title}&entity=movie"
@@ -34,20 +38,37 @@ def GetGenre():
         if response.status_code == 200:
             data = response.json() # parse JSON data
             for entry in data['results']:
+                #print(entry)
                 genres_lst.append(entry['primaryGenreName'])
+                itunes_titles = entry['trackName']
+                #print(itunes_title)
+                newlst.append(itunes_titles)
+                for x in range(len(newlst)):
+                    newdct[newlst[x]] = genres_lst[x]
         else:
             print(f"Error: {response.status_code}")
     unique_genres = list(set(genres_lst))
     #print(unique_genres)
-        
+    #print(genres_lst)
+    print(newdct)
     id = 0
     for genre in unique_genres:
         genres_dct[id] = genre
         id += 1
     #print(genres_dct)
     
-    with sqlite3.connect('itunes.db') as conn:
+    
+
+            
+    
+
+    with sqlite3.connect('imdb.db') as conn:
         cur = conn.cursor()
+        cur.execute('''
+            DROP TABLE IF EXISTS itunes
+        ''')
+        conn.commit()
+
         cur.execute('''
             CREATE TABLE IF NOT EXISTS itunes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,6 +81,24 @@ def GetGenre():
             cur.execute('INSERT INTO itunes (id, genre) VALUES (?, ?)',
             (id, genre))
             conn.commit()
+        
+        cur.execute('''
+            DROP TABLE IF EXISTS movie_info
+        ''')
+        conn.commit()
+
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS movie_info (
+                title STRING ,
+                rating INTEGER ,
+                genre STRING,
+                genre_id INTEGER
+            );
+        ''')
+        conn.commit()
+
+        
+
         cur.close()
 
 GetGenre()
