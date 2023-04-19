@@ -50,7 +50,7 @@ def GetGenre():
     unique_genres = list(set(genres_lst))
     #print(unique_genres)
     #print(genres_lst)
-    print(newdct)
+    #print(newdct)
     id = 0
     for genre in unique_genres:
         genres_dct[id] = genre
