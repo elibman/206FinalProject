@@ -82,20 +82,20 @@ def GetGenre():
             (id, genre))
             conn.commit()
         
-        cur.execute('''
-            DROP TABLE IF EXISTS movie_info
-        ''')
-        conn.commit()
+        # cur.execute('''
+        #     DROP TABLE IF EXISTS movie_info
+        # ''')
+        # conn.commit()
 
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS movie_info (
-                title STRING ,
-                rating INTEGER ,
-                genre STRING,
-                genre_id INTEGER
-            );
-        ''')
-        conn.commit()
+        # cur.execute('''
+        #     CREATE TABLE IF NOT EXISTS movie_info (
+        #         title STRING ,
+        #         rating INTEGER ,
+        #         genre STRING,
+        #         genre_id INTEGER
+        #     );
+        # ''')
+        # conn.commit()
 
         
 
