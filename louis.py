@@ -6,38 +6,114 @@ import sqlite3
 
 
 
+
+
+
 def Getratingfromimdb():
 
-    url = "https://imdb-top-100-movies.p.rapidapi.com/"
 
-    headers = {
-	"X-RapidAPI-Key": "d53ac055e7mshea37be8e69920fap17a024jsnc6076add2e01",
-	"X-RapidAPI-Host": "imdb-top-100-movies.p.rapidapi.com"
-    }
+   url = "https://imdb-top-100-movies.p.rapidapi.com/"
 
-    response = requests.request("GET", url, headers=headers)
-    data = response.text
-    d = json.loads(data)
 
-    info = {}
-    for x in d:
-        info[x["title"]] = x["rating"]
-    
-    with sqlite3.connect('imdb.db') as conn:
-        cur = conn.cursor()
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS imdb (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                rating INTEGER NOT NULL
-            );
-        ''')
-        conn.commit()
+   headers = {
+   "X-RapidAPI-Key": "d53ac055e7mshea37be8e69920fap17a024jsnc6076add2e01",
+   "X-RapidAPI-Host": "imdb-top-100-movies.p.rapidapi.com"
+   }
 
-        for title, rating in info.items():
-            cur.execute('INSERT INTO imdb (title, rating) VALUES (?, ?)',
-            (title, rating))
-            conn.commit()
-        cur.close()
+
+   response = requests.request("GET", url, headers=headers)
+   data = response.text
+   d = json.loads(data)
+
+
+   titles = []
+   ratings = []
+   ids = []
+   for x in d:
+       ids.append(x["imdbid"])
+       titles.append(x["title"])
+       ratings.append(x["rating"])
+  
+   with sqlite3.connect('imdb.db') as conn:
+       cur = conn.cursor()
+       cur.execute('''
+           CREATE TABLE IF NOT EXISTS imdb (
+               id INTEGER PRIMARY KEY AUTOINCREMENT,
+               title TEXT NOT NULL,
+               rating INTEGER NOT NULL
+           );
+       ''')
+       conn.commit()
+           
+       start = len(cur.execute("select * from imdb").fetchall())
+       
+       end = start + 25
+       while start < end:
+            try:
+                cur.execute('INSERT INTO imdb (title, rating) VALUES (?, ?)',
+                    (titles[start], ratings[start]))
+                conn.commit()
+                start += 1
+            except:
+                return None
+
+
+       cur.close()
+
 
 Getratingfromimdb()
+  
+
+
+def getmovieid():
+   url = "https://imdb-top-100-movies.p.rapidapi.com/"
+
+
+   headers = {
+   "X-RapidAPI-Key": "d53ac055e7mshea37be8e69920fap17a024jsnc6076add2e01",
+   "X-RapidAPI-Host": "imdb-top-100-movies.p.rapidapi.com"
+   }
+  
+   response = requests.request("GET", url, headers=headers)
+   data = response.text
+   d = json.loads(data)
+
+
+   ids = []
+   for x in d:
+       ids.append(x["imdbid"])
+   return ids
+
+
+
+
+
+
+
+
+'''       
+make to 25 each
+
+
+use length of data base as index
+
+
+ask how to do 25
+how to clarify that we are all adding to the same data base so it is all one and how multiple people see it
+
+
+establish where you need to start counting
+
+
+use count function
+'''
+"""
+start = len(cur.execute("select * from imdb"))
+end = start + 25
+while start < end:
+   row = info.items()
+   cur.execute('INSERT INTO imdb (title, rating) VALUES (?, ?)',
+       (row[start[0]], row[start[1]]))
+   start += 1
+  
+"""
