@@ -5,7 +5,7 @@ import sqlite3
 import unittest 
 import json
 
-def GetGenre():
+def get_genres_dct():
 
     imdb_url = "https://imdb-top-100-movies.p.rapidapi.com/"
 
@@ -57,17 +57,18 @@ def GetGenre():
         id += 1
     #print(genres_dct)
     
+    return genres_dct
     
-
+get_genres_dct()
             
-    
+def create_tables(dct):    
 
     with sqlite3.connect('imdb.db') as conn:
         cur = conn.cursor()
+
         cur.execute('''
             DROP TABLE IF EXISTS itunes
         ''')
-        conn.commit()
 
         cur.execute('''
             CREATE TABLE IF NOT EXISTS itunes (
@@ -76,16 +77,15 @@ def GetGenre():
             );
         ''')
         conn.commit()
-
-        for id, genre in genres_dct.items():
-            cur.execute('INSERT INTO itunes (id, genre) VALUES (?, ?)',
-            (id, genre))
-            conn.commit()
-        
-        # cur.execute('''
-        #     DROP TABLE IF EXISTS movie_info
-        # ''')
-        # conn.commit()
+        start = len(cur.execute('SELECT * FROM itunes').fetchall())
+        end = start + 25
+        for i in range(start, end):
+            if i >= len(dct.keys()):
+                break
+            for id, genre in dct.items():
+                cur.execute('INSERT INTO itunes (id, genre) VALUES (?, ?)',
+                (id, genre))
+                conn.commit()
 
         # cur.execute('''
         #     CREATE TABLE IF NOT EXISTS movie_info (
@@ -95,10 +95,6 @@ def GetGenre():
         #         genre_id INTEGER
         #     );
         # ''')
-        # conn.commit()
+        conn.commit()
 
-        
-
-        cur.close()
-
-GetGenre()
+create_tables(get_genres_dct())
