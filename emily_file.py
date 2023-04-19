@@ -56,8 +56,8 @@ def get_genres_dct():
         genres_dct[id] = genre
         id += 1
     #print(genres_dct)
-    
-    return genres_dct
+    #print(newdct)
+    return (genres_dct, newdct)
     
 get_genres_dct()
             
@@ -67,7 +67,7 @@ def create_tables(dct):
         cur = conn.cursor()
 
         cur.execute('''
-            DROP TABLE IF EXISTS itunes
+            DROP TABLE IF EXISTS movie_info
         ''')
 
         cur.execute('''
@@ -77,24 +77,43 @@ def create_tables(dct):
             );
         ''')
         conn.commit()
-        start = len(cur.execute('SELECT * FROM itunes').fetchall())
-        end = start + 25
-        for i in range(start, end):
-            if i >= len(dct.keys()):
-                break
-            for id, genre in dct.items():
-                cur.execute('INSERT INTO itunes (id, genre) VALUES (?, ?)',
-                (id, genre))
-                conn.commit()
 
-        # cur.execute('''
-        #     CREATE TABLE IF NOT EXISTS movie_info (
-        #         title STRING ,
-        #         rating INTEGER ,
-        #         genre STRING,
-        #         genre_id INTEGER
-        #     );
-        # ''')
+        for id, genre in dct[0].items():
+            cur.execute('INSERT INTO itunes (id, genre) VALUES (?, ?)',
+                (id, genre))
+            conn.commit()
+
+
+
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS movie_genre (
+                title STRING,
+                genre STRING,
+                genre_id INTEGER
+            );
+        ''')
+
         conn.commit()
+
+        start = len(cur.execute("select * from movie_genre").fetchall())
+        print(start)
+        print(dct[1].items())
+        end = start + 25
+        while start < end:
+            try:
+                for movie_title, movie_genres in dct[1].items():
+                    for genre in movie_genres:
+                        # Get the genre ID from the unique_genres table based on the genre name
+                        cur.execute('SELECT id FROM itunes WHERE genre = ?', (genre,))
+                        genre_id = cur.fetchone()[0]
+                        print(genre_id)
+        
+                        # Insert a new row into the movie_genre table with the movie title, genre, and genre ID
+                        cur.execute('INSERT INTO movie_genre (movie_title, genre, genre_id) VALUES (?, ?, ?)', (movie_title, genre, genre_id))
+                        conn.commit()
+                start += 1
+            except:
+                return None
+        cur.close()
 
 create_tables(get_genres_dct())
