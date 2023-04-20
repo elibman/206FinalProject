@@ -42,7 +42,7 @@ def avg_per_rating(imdb):
         elif row[2] <= 8.5 and row[2] >= 8.4:
             avg_four += row[0]
             count_four += 1
-        elif row[2] < 8.4:
+        else:
             avg_last += row[0]
             count_last += 1  
 
