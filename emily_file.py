@@ -30,6 +30,7 @@ def get_genres_dct():
     genres_lst = []
     title_dct = {}
     title_lst = []
+    freshlst = []
     for movie_title in movies:
         #print(movie_title)
         url = f"https://itunes.apple.com/search?term={movie_title}&entity=movie"
@@ -45,12 +46,10 @@ def get_genres_dct():
         else:
             print(f"Error: {response.status_code}")
     for i in range(len(movies)):
-        title_dct[title_lst[i]] = genres_lst[i]
-
-    for b in title_dct:
-        genres = b[1]
-    print(genres)
+        title_dct = {'title': title_lst[i], 'genre': genres_lst[i]}
+        freshlst.append(title_dct)
     #print(title_dct)
+    #print(freshlst)
 
     unique_genres = []
     for x in genres_lst:
@@ -66,12 +65,11 @@ def get_genres_dct():
 
     #print(movies)
     #print(len(movies))
-    return (genres_dct, title_dct, movies)
+    return (genres_dct, movies, freshlst)
     
 get_genres_dct()
             
-def create_tables(dct):    
-
+def create_tables(dct):   
     with sqlite3.connect('imdb.db') as conn:
         cur = conn.cursor()
 
@@ -93,10 +91,6 @@ def create_tables(dct):
             conn.commit()
 
         cur.execute('''
-            DROP TABLE IF EXISTS movie_genre
-        ''')
-
-        cur.execute('''
             CREATE TABLE IF NOT EXISTS movie_genre (
                 title STRING,
                 genre_id INTEGER
@@ -107,67 +101,71 @@ def create_tables(dct):
         start = len(cur.execute("select * from movie_genre").fetchall())
         end = start + 25
         for i in range(start, end):
-            if i >= len(dct[2]):
+            if i >= len(dct[1]):
                 break
-            try:
-                for movie_title, movie_genres in dct[1].items():
-                    if movie_genres == 'Drama':
-                        genre_id = 0
-                    elif movie_genres == 'Western':
-                        genre_id = 1
-                    elif movie_genres == 'Anime':
-                        genre_id = 2
-                    elif movie_genres == 'Documentary':
-                        genre_id = 3
-                    elif movie_genres == 'Thriller':
-                        genre_id = 4
-                    elif movie_genres == 'Action & Adventure':
-                        genre_id = 5
-                    elif movie_genres == 'Foreign':
-                        genre_id = 6
-                    elif movie_genres == 'Music Feature Films':
-                        genre_id = 7
-                    elif movie_genres == 'Comedy':
-                        genre_id = 8
-                    elif movie_genres == 'Horror':
-                        genre_id = 9
-                    elif movie_genres == 'Sci-Fi & Fantasy':
-                        genre_id = 10
-                    elif movie_genres == 'Kids & Family':
-                        genre_id = 11
-                    elif movie_genres == 'Musicals':
-                        genre_id = 12
-                    elif movie_genres == 'Romance':
-                        genre_id = 13
-                    elif movie_genres == 'Holiday':
-                        genre_id = 14
-                    elif movie_genres == 'Bollywood':
-                        genre_id = 15
-                    elif movie_genres == 'Independent':
-                        genre_id = 16
-                    elif movie_genres == 'Concert Films':
-                        genre_id = 17
-                    elif movie_genres == 'Sports':
-                        genre_id = 18
-                    elif movie_genres == 'Classics':
-                        genre_id = 19
-                    elif movie_genres == 'Special Interest':
-                        genre_id = 20
-                    elif movie_genres == 'Short Films':
-                        genre_id = 21
-                    elif movie_genres == 'Music Documentaries':
-                        genre_id = 22
+            row = dct[2][i]
+            #print(row)
+            # try:
+            #     for movie_title, movie_genres in dct[1].items():
+            if row['genre'] == 'Drama':
+                genre_id = 0
+            elif row['genre'] == 'Western':
+                genre_id = 1
+            elif row['genre'] == 'Anime':
+                genre_id = 2
+            elif row['genre'] == 'Documentary':
+                genre_id = 3
+            elif row['genre'] == 'Thriller':
+                genre_id = 4
+            elif row['genre'] == 'Action & Adventure':
+                genre_id = 5
+            elif row['genre'] == 'Foreign':
+                genre_id = 6
+            elif row['genre'] == 'Music Feature Films':
+                genre_id = 7
+            elif row['genre'] == 'Comedy':
+                genre_id = 8
+            elif row['genre'] == 'Horror':
+                genre_id = 9
+            elif row['genre'] == 'Sci-Fi & Fantasy':
+                genre_id = 10
+            elif row['genre'] == 'Kids & Family':
+                genre_id = 11
+            elif row['genre'] == 'Musicals':
+                genre_id = 12
+            elif row['genre'] == 'Romance':
+                genre_id = 13
+            elif row['genre'] == 'Holiday':
+                genre_id = 14
+            elif row['genre'] == 'Bollywood':
+                genre_id = 15
+            elif row['genre'] == 'Independent':
+                genre_id = 16
+            elif row['genre'] == 'Concert Films':
+                genre_id = 17
+            elif row['genre'] == 'Sports':
+                genre_id = 18
+            elif row['genre'] == 'Classics':
+                genre_id = 19
+            elif row['genre'] == 'Special Interest':
+                genre_id = 20
+            elif row['genre'] == 'Short Films':
+                genre_id = 21
+            elif row['genre'] == 'Music Documentaries':
+                genre_id = 22
+            
+            cur.execute('INSERT INTO movie_genre (title, genre_id) VALUES (?, ?)',
+                        (row['title'], genre_id))
+        conn.commit()
 
-                    cur.execute('SELECT COUNT(*) FROM movie_genre WHERE title = ? AND genre_id = ?', (movie_title, genre_id))
-                    count = cur.fetchone()[0]
+            # cur.execute('SELECT COUNT(*) FROM movie_genre WHERE title = ? AND genre_id = ?', (movie_title, genre_id))
+            # count = cur.fetchone()[0]
 
-                    # If a record doesn't already exist, insert a new one
-                    if count == 0:
-                        cur.execute('INSERT INTO movie_genre (title, genre_id) VALUES (?, ?)', (movie_title, genre_id))
-                        conn.commit()
+            # # If a record doesn't already exist, insert a new one
+            # if count == 0:
+            #     cur.execute('INSERT INTO movie_genre (title, genre_id) VALUES (?, ?)', (movie_title, genre_id))
+            #     conn.commit()
 
-            except:
-                return None
-        cur.close()
+    cur.close()
 
 create_tables(get_genres_dct())
