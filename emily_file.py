@@ -37,8 +37,6 @@ def get_genres_dct():
         if response.status_code == 200:
             data = response.json() # parse JSON data
             #print(data)
-            #print(data['results'])
-            # while len(data['results']) < 100:
             for entry in data['results']:
                 #print(entry)
                 genres_lst.append(entry['primaryGenreName'])
@@ -48,8 +46,12 @@ def get_genres_dct():
             print(f"Error: {response.status_code}")
     for i in range(len(movies)):
         title_dct[title_lst[i]] = genres_lst[i]
+
+    for b in title_dct:
+        genres = b[1]
+    print(genres)
     #print(title_dct)
-    
+
     unique_genres = []
     for x in genres_lst:
         if x not in unique_genres:
@@ -103,19 +105,58 @@ def create_tables(dct):
 
         
         start = len(cur.execute("select * from movie_genre").fetchall())
-        #print(start)
-        #print(dct[1].items())
-        #print(len(dct[1].items()))
-        #print(len(dct[1]))
         end = start + 25
         for i in range(start, end):
             if i >= len(dct[2]):
                 break
             try:
                 for movie_title, movie_genres in dct[1].items():
-                    # Get the genre ID from the unique_genres table based on the genre name
-                    cur.execute('SELECT id FROM itunes WHERE genre = ?', (movie_genres,))
-                    genre_id = cur.fetchone()[0]
+                    if movie_genres == 'Drama':
+                        genre_id = 0
+                    elif movie_genres == 'Western':
+                        genre_id = 1
+                    elif movie_genres == 'Anime':
+                        genre_id = 2
+                    elif movie_genres == 'Documentary':
+                        genre_id = 3
+                    elif movie_genres == 'Thriller':
+                        genre_id = 4
+                    elif movie_genres == 'Action & Adventure':
+                        genre_id = 5
+                    elif movie_genres == 'Foreign':
+                        genre_id = 6
+                    elif movie_genres == 'Music Feature Films':
+                        genre_id = 7
+                    elif movie_genres == 'Comedy':
+                        genre_id = 8
+                    elif movie_genres == 'Horror':
+                        genre_id = 9
+                    elif movie_genres == 'Sci-Fi & Fantasy':
+                        genre_id = 10
+                    elif movie_genres == 'Kids & Family':
+                        genre_id = 11
+                    elif movie_genres == 'Musicals':
+                        genre_id = 12
+                    elif movie_genres == 'Romance':
+                        genre_id = 13
+                    elif movie_genres == 'Holiday':
+                        genre_id = 14
+                    elif movie_genres == 'Bollywood':
+                        genre_id = 15
+                    elif movie_genres == 'Independent':
+                        genre_id = 16
+                    elif movie_genres == 'Concert Films':
+                        genre_id = 17
+                    elif movie_genres == 'Sports':
+                        genre_id = 18
+                    elif movie_genres == 'Classics':
+                        genre_id = 19
+                    elif movie_genres == 'Special Interest':
+                        genre_id = 20
+                    elif movie_genres == 'Short Films':
+                        genre_id = 21
+                    elif movie_genres == 'Music Documentaries':
+                        genre_id = 22
 
                     cur.execute('SELECT COUNT(*) FROM movie_genre WHERE title = ? AND genre_id = ?', (movie_title, genre_id))
                     count = cur.fetchone()[0]
