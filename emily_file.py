@@ -25,39 +25,46 @@ def get_genres_dct():
         info[x["title"]] = x["rating"]
 
     movies = info.keys()
-    #print(movies)
 
     genres_dct = {}
     genres_lst = []
-    newdct = {}
-    newlst = []
+    title_dct = {}
+    title_lst = []
     for movie_title in movies:
         #print(movie_title)
         url = f"https://itunes.apple.com/search?term={movie_title}&entity=movie"
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json() # parse JSON data
+            #print(data)
+            #print(data['results'])
+            # while len(data['results']) < 100:
             for entry in data['results']:
                 #print(entry)
                 genres_lst.append(entry['primaryGenreName'])
-                itunes_titles = entry['trackName']
-                #print(itunes_title)
-                newlst.append(itunes_titles)
-                for x in range(len(newlst)):
-                    newdct[newlst[x]] = genres_lst[x]
+                title_lst.append(entry['trackName'])
+            
         else:
             print(f"Error: {response.status_code}")
-    unique_genres = list(set(genres_lst))
+    for i in range(len(movies)):
+        title_dct[title_lst[i]] = genres_lst[i]
+    #print(title_dct)
+    
+    unique_genres = []
+    for x in genres_lst:
+        if x not in unique_genres:
+            unique_genres.append(x)
+    #print(unique_genres)
     #print(unique_genres)
     #print(genres_lst)
-    #print(newdct)
     id = 0
     for genre in unique_genres:
         genres_dct[id] = genre
         id += 1
-    #print(genres_dct)
-    #print(newdct)
-    return (genres_dct, newdct)
+
+    #print(movies)
+    #print(len(movies))
+    return (genres_dct, title_dct, movies)
     
 get_genres_dct()
             
@@ -83,33 +90,41 @@ def create_tables(dct):
                 (id, genre))
             conn.commit()
 
-
+        cur.execute('''
+            DROP TABLE IF EXISTS movie_genre
+        ''')
 
         cur.execute('''
             CREATE TABLE IF NOT EXISTS movie_genre (
                 title STRING,
-                genre STRING,
                 genre_id INTEGER
             );
         ''')
 
-        conn.commit()
-
+        
         start = len(cur.execute("select * from movie_genre").fetchall())
         #print(start)
         #print(dct[1].items())
+        #print(len(dct[1].items()))
+        #print(len(dct[1]))
         end = start + 25
-        while start < end:
+        for i in range(start, end):
+            if i >= len(dct[2]):
+                break
             try:
                 for movie_title, movie_genres in dct[1].items():
                     # Get the genre ID from the unique_genres table based on the genre name
-                    cur.execute('SELECT id FROM itunes WHERE genre = ?', (genre,))
+                    cur.execute('SELECT id FROM itunes WHERE genre = ?', (movie_genres,))
                     genre_id = cur.fetchone()[0]
-    
-                    # Insert a new row into the movie_genre table with the movie title, genre, and genre ID
-                    cur.execute('INSERT INTO movie_genre (movie_title, genre, genre_id) VALUES (?, ?, ?)', (movie_title, movie_genres, genre_id))
-                    conn.commit()
-                start += 1
+
+                    cur.execute('SELECT COUNT(*) FROM movie_genre WHERE title = ? AND genre_id = ?', (movie_title, genre_id))
+                    count = cur.fetchone()[0]
+
+                    # If a record doesn't already exist, insert a new one
+                    if count == 0:
+                        cur.execute('INSERT INTO movie_genre (title, genre_id) VALUES (?, ?)', (movie_title, genre_id))
+                        conn.commit()
+
             except:
                 return None
         cur.close()
