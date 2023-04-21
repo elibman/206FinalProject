@@ -110,10 +110,6 @@ def avg_per_genre(imdb):
     b11 /= count11
     b12 /= count12
     b13 /= count13
-
-    list = (b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13)
-    for row in list:
-        print(row)
    
 
     # Create a bar graph of the results
