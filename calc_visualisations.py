@@ -1,8 +1,184 @@
 import sqlite3
 import matplotlib.pyplot as plt
 
-def avg_per_genre():
-    #Calculate teh average cost of a movie per genre
+def avg_per_genre(imdb):
+    #Calculate the average cost of a movie per genre
+    conn = sqlite3.connect(imdb)
+    c = conn.cursor()
+
+    c.execute('''
+    SELECT budget.budget, movie_genre.title, itunes.genre
+    FROM budget
+    JOIN movie_genre
+    ON budget.title = movie_genre.title
+    JOIN itunes
+    ON movie_genre.genre_id = itunes.id
+    ''')
+    
+    rows = c.fetchall()
+    data = []
+    budget = []
+    genre = []
+    for row in rows:
+        data.append((row[0], row[1], row[2]))
+        budget.append(row[0])
+        genre.append(row[2])
+
+    print(rows)
+    count1 = 0
+    count2 = 0
+    count3 = 0
+    count4 = 0
+    count5 = 0
+    count6 = 0
+    count7 = 0
+    count8 = 0
+    count9 = 0
+    count10 = 0
+    count11 = 0
+    count12 = 0
+    count13 = 0
+    count14 = 0
+    count15 = 0
+    count16 = 0
+    count17 = 0
+    count18 = 0
+    count19 = 0
+    count20 = 0
+    count21 = 0
+    count22 = 0
+    count23 = 0
+
+    b1 = 0
+    b2 = 0
+    b3 = 0
+    b4 = 0
+    b5 = 0
+    b6 = 0
+    b7 = 0
+    b8 = 0
+    b9 = 0
+    b10 = 0
+    b11 = 0
+    b12 = 0
+    b13 = 0
+    b14 = 0
+    b15 = 0
+    b16 = 0
+    b17 = 0
+    b18 = 0
+    b19 = 0
+    b20 = 0
+    b21 = 0
+    b22 = 0
+    b23 = 0
+
+    for row in rows:
+        if row[2] == 'Drama':
+            b1 += row[0]
+            count1 += 1
+        elif row[2] == 'Anime':
+            b2 += row[0]
+            count2 += 1
+        elif row[2] == 'Documentary':
+            b3 += row[0]
+            count3 += 1
+        elif row[2] == 'Thriller':
+            b4 += row[0]
+            count4 += 1
+        elif row[2] == 'Action & Adventure':
+            b5 += row[0]
+            count5 += 1
+        elif row[2] == 'Foreign':
+            b6 += row[0]
+            count6 += 1
+        elif row[2] == 'Music Feature Films':
+            b7 += row[0]
+            count7 += 1
+        elif row[2] == 'Comedy':
+            b8 += row[0]
+            count8 += 1
+        elif row[2] == 'Horror':
+            b9 += row[0]
+            count9 += 1
+        elif row[2] == 'Sci-Fi & Fantasy':
+            b10 += row[0]
+            count10 += 1
+        elif row[2] == 'Kids & Family':
+            b11 += row[0]
+            count11 += 1
+        elif row[2] == 'Musicals':
+            b12 += row[0]
+            count12 += 1
+        elif row[2] == 'Romance':
+            b13 += row[0]
+            count13 += 1
+        elif row[2] == 'Holiday':
+            b14 += row[0]
+            count14 += 1
+        elif row[2] == 'Bollywood':
+            b15 += row[0]
+            count15 += 1
+        elif row[2] == 'Independent':
+            b16 += row[0]
+            count16 += 1
+        elif row[2] == 'Concert Films':
+            b17 += row[0]
+            count17 += 1
+        elif row[2] == 'Sports':
+            b18 += row[0]
+            count18 += 1
+        elif row[2] == 'Classics':
+            b19 += row[0]
+            count19 += 1
+        elif row[2] == 'Special Interest':
+            b20 += row[0]
+            count20 += 1
+        elif row[2] == 'Short Films':
+            b21 += row[0]
+            count21 += 1
+        elif row[2] == 'Music Documentaries':
+            b22 += row[0]
+            count22 += 1   
+        elif row[2] == 'Western':
+            b23 += row[0]
+            count23 += 1
+
+    b1 /= count1
+    b2 /= count2
+    b3 /= count3
+    b4 /= count4
+    b5 /= count5
+    b6 /= count6
+    b7 /= count7
+    b8 /= count8
+    b9 /= count9
+    b10 /= count10
+    b11 /= count11
+    b12 /= count12
+    b13 /= count13
+    b14 /= count14
+    b15 /= count15
+    b16 /= count16
+    b17 /= count17
+    b18 /= count18
+    b19 /= count19
+    b20 /= count20
+    b21 /= count21
+    b22 /= count22
+    b23 /= count23
+
+   
+
+    # Create a bar graph of the results
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.bar(genre, budget)
+    ax.set_xlabel('Genre')
+    ax.set_ylabel('Average Budget')
+    ax.set_title('Average Budget by Genre')
+    plt.xticks(rotation=90)
+    plt.show()
+
     pass
 
 def avg_per_rating(imdb):
@@ -74,4 +250,5 @@ def rating_per_genre():
     #calculate the average rating per genre
     pass
 
-avg_per_rating('imdb.db')
+#avg_per_rating('imdb.db')
+avg_per_genre('imdb.db')
