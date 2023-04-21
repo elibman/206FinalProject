@@ -7,29 +7,47 @@ import json
 
 def get_genres_dct():
 
+
     imdb_url = "https://imdb-top-100-movies.p.rapidapi.com/"
 
     headers = {
-	"X-RapidAPI-Key": "d53ac055e7mshea37be8e69920fap17a024jsnc6076add2e01",
-	"X-RapidAPI-Host": "imdb-top-100-movies.p.rapidapi.com"
+        "X-RapidAPI-Key": "536c152bbemshbc7cbb92a43fe41p1ff4fbjsnba9018e95bd7",
+        "X-RapidAPI-Host": "imdb-top-100-movies.p.rapidapi.com"
     }
 
     imdb_response = requests.request("GET", imdb_url, headers=headers)
+
+    
+    # imdb_url = "https://imdb-top-100-movies.p.rapidapi.com/"
+
+    # headers = {
+	# "X-RapidAPI-Key": "d53ac055e7mshea37be8e69920fap17a024jsnc6076add2e01",
+	# "X-RapidAPI-Host": "imdb-top-100-movies.p.rapidapi.com"
+    # }
+
+    # imdb_response = requests.request("GET", imdb_url, headers=headers)
     imdb_data = imdb_response.text
     d = json.loads(imdb_data)
 
+    #print(d)
+    title_lst = []
     info = {}
     for x in d:
+        #print(x)
         title = x['title']
         rating = x['rating']
-        info[x["title"]] = x["rating"]
+        info[x['title']] = x['rating']
+        #title_lst.append(title)
 
     movies = info.keys()
-
+    #print(movies)
+    for w in movies:
+        title_lst.append(w)
+    
     genres_dct = {}
     genres_lst = []
     title_dct = {}
-    title_lst = []
+    
     freshlst = []
     for movie_title in movies:
         #print(movie_title)
@@ -41,10 +59,10 @@ def get_genres_dct():
             for entry in data['results']:
                 #print(entry)
                 genres_lst.append(entry['primaryGenreName'])
-                title_lst.append(entry['trackName'])
             
         else:
             print(f"Error: {response.status_code}")
+    #print(title_lst)
     for i in range(len(movies)):
         title_dct = {'title': title_lst[i], 'genre': genres_lst[i]}
         freshlst.append(title_dct)
@@ -73,6 +91,8 @@ def create_tables(dct):
     with sqlite3.connect('imdb.db') as conn:
         cur = conn.cursor()
 
+        
+
         cur.execute('''
             DROP TABLE IF EXISTS itunes
         ''')
@@ -89,6 +109,7 @@ def create_tables(dct):
             cur.execute('INSERT INTO itunes (id, genre) VALUES (?, ?)',
                 (id, genre))
             conn.commit()
+        
 
         cur.execute('''
             CREATE TABLE IF NOT EXISTS movie_genre (
@@ -104,7 +125,7 @@ def create_tables(dct):
             if i >= len(dct[1]):
                 break
             row = dct[2][i]
-            #print(row)
+            #print(row['title'])
             # try:
             #     for movie_title, movie_genres in dct[1].items():
             if row['genre'] == 'Drama':
