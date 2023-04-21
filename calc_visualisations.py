@@ -38,16 +38,7 @@ def avg_per_genre(imdb):
     count11 = 0
     count12 = 0
     count13 = 0
-    count14 = 0
-    count15 = 0
-    count16 = 0
-    count17 = 0
-    count18 = 0
-    count19 = 0
-    count20 = 0
-    count21 = 0
-    count22 = 0
-    count23 = 0
+
 
     b1 = 0
     b2 = 0
@@ -62,16 +53,7 @@ def avg_per_genre(imdb):
     b11 = 0
     b12 = 0
     b13 = 0
-    b14 = 0
-    b15 = 0
-    b16 = 0
-    b17 = 0
-    b18 = 0
-    b19 = 0
-    b20 = 0
-    b21 = 0
-    b22 = 0
-    b23 = 0
+
 
     for row in rows:
         if row[2] == 'Drama':
@@ -113,36 +95,7 @@ def avg_per_genre(imdb):
         elif row[2] == 'Romance':
             b13 += row[0]
             count13 += 1
-        elif row[2] == 'Holiday':
-            b14 += row[0]
-            count14 += 1
-        elif row[2] == 'Bollywood':
-            b15 += row[0]
-            count15 += 1
-        elif row[2] == 'Independent':
-            b16 += row[0]
-            count16 += 1
-        elif row[2] == 'Concert Films':
-            b17 += row[0]
-            count17 += 1
-        elif row[2] == 'Sports':
-            b18 += row[0]
-            count18 += 1
-        elif row[2] == 'Classics':
-            b19 += row[0]
-            count19 += 1
-        elif row[2] == 'Special Interest':
-            b20 += row[0]
-            count20 += 1
-        elif row[2] == 'Short Films':
-            b21 += row[0]
-            count21 += 1
-        elif row[2] == 'Music Documentaries':
-            b22 += row[0]
-            count22 += 1   
-        elif row[2] == 'Western':
-            b23 += row[0]
-            count23 += 1
+
 
     b1 /= count1
     b2 /= count2
@@ -157,16 +110,7 @@ def avg_per_genre(imdb):
     b11 /= count11
     b12 /= count12
     b13 /= count13
-    b14 /= count14
-    b15 /= count15
-    b16 /= count16
-    b17 /= count17
-    b18 /= count18
-    b19 /= count19
-    b20 /= count20
-    b21 /= count21
-    b22 /= count22
-    b23 /= count23
+
 
    
 
@@ -250,5 +194,6 @@ def rating_per_genre():
     #calculate the average rating per genre
     pass
 
-#avg_per_rating('imdb.db')
+
 avg_per_genre('imdb.db')
+avg_per_rating('imdb.db')
